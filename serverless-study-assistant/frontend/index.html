@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Serverless Study Assistant | VIT Academic Project</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-branding">
+        <div class="brand-badge">VIT Fall 2026</div>
+        <h1>Serverless Chatbot with MLOps Pipeline</h1>
+        <p class="subtitle">AI-Powered Academic Study Assistant &bull; Dhanush S (23MIS0224) &bull; Prof. Arun Kumar</p>
+      </div>
+
+      <div class="header-meta">
+        <div class="status-pill" id="system-status">
+          <span class="status-dot"></span>
+          <span class="status-label">Checking System...</span>
+        </div>
+        <div class="version-badge" id="model-version-tag">Version: v1.0.0</div>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+      <!-- Sidebar / Quick Prompts & Stats -->
+      <aside class="sidebar">
+        <div class="sidebar-section">
+          <h3>Academic Topics</h3>
+          <p class="section-desc">Click an example question to populate the chat:</p>
+          <div class="quick-prompts">
+            <button class="prompt-chip" data-query="What is the difference between a Scrum Sprint Backlog and Product Backlog?">
+              Agile Scrum Backlogs
+            </button>
+            <button class="prompt-chip" data-query="Explain CI/CD in DevOps and how automated testing works.">
+              DevOps CI/CD Pipelines
+            </button>
+            <button class="prompt-chip" data-query="How does serverless computing like AWS Lambda benefit DevOps deployment?">
+              AWS Lambda Serverless
+            </button>
+            <button class="prompt-chip" data-query="Explain the four necessary conditions for deadlock in operating systems.">
+              OS Coffman Deadlock Conditions
+            </button>
+            <button class="prompt-chip" data-query="Explain the TCP three-way handshake connection establishment process.">
+              TCP 3-Way Handshake
+            </button>
+            <button class="prompt-chip" data-query="What are ACID properties in database transaction management?">
+              ACID Database Transactions
+            </button>
+            <button class="prompt-chip" data-query="What is model drift and how does an MLOps pipeline address it?">
+              MLOps Drift & Retraining
+            </button>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>Active Architecture</h3>
+          <div class="architecture-specs">
+            <div class="spec-item">
+              <span class="spec-label">Backend</span>
+              <span class="spec-value">FastAPI / Uvicorn</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">AI Engine</span>
+              <span class="spec-value" id="engine-display">Groq / LLaMA (Fallback Ready)</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Storage</span>
+              <span class="spec-value" id="storage-display">SQLite / DynamoDB</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Cloud Artifacts</span>
+              <span class="spec-value">Amazon S3</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Observability</span>
+              <span class="spec-value">Amazon CloudWatch</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-actions">
+            <button id="btn-retrain" class="btn-action">Trigger MLOps Retrain Run</button>
+            <button id="btn-clear" class="btn-secondary">Clear Chat Session</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Chat Area -->
+      <main class="chat-wrapper">
+        <!-- Message History -->
+        <div class="chat-messages" id="chat-messages">
+          <!-- Initial Welcome Message -->
+          <div class="message-row assistant">
+            <div class="avatar">AI</div>
+            <div class="message-content">
+              <div class="message-header">
+                <span class="sender-name">Study Assistant</span>
+                <span class="badge mode-badge">Ready</span>
+              </div>
+              <div class="message-text">
+                <p>Hello Dhanush! Welcome to your <strong>Serverless Study Assistant with MLOps Pipeline</strong>.</p>
+                <p>I am designed to explain core concepts in <strong>Agile Development Process</strong>, <strong>DevOps Architecture</strong>, <strong>Operating Systems</strong>, <strong>Networks</strong>, and <strong>Cloud Computing</strong>.</p>
+                <p>Ask any academic question below or select one of the prompts on the left to test the reasoning engine and live operational telemetry.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input Bar -->
+        <div class="chat-input-area">
+          <form id="chat-form" class="input-form">
+            <textarea
+              id="user-input"
+              placeholder="Ask an academic question (e.g. Explain Coffman deadlock conditions or CI/CD pipelines)..."
+              rows="1"
+              required
+            ></textarea>
+            <button type="submit" id="send-button" class="btn-send">
+              <span>Send</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </form>
+          <div class="input-footer">
+            <span>Press <kbd>Enter</kbd> to send, <kbd>Shift + Enter</kbd> for newline</span>
+            <span id="char-counter">0 / 2000</span>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

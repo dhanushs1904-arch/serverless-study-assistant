@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment and Secrets
+.env
+.env.local
+*.pem
+credentials.json
+
+# Local Databases and Artifacts
+*.db
+*.sqlite3
+data/*.db
+data/reports/*
+!data/reports/.gitkeep
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# AWS SAM & Build Artifacts
+.aws-sam/
+package/
+dist/
+build/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp

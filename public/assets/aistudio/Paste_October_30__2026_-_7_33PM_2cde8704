@@ -1,0 +1,1050 @@
+# MASTER PROMPT: BUILD MY ENTIRE FINAL-YEAR ACADEMIC PROJECT FROM ZERO
+
+## 1. YOUR ROLE
+
+Act as my senior software engineer, Python developer, full-stack developer, AI integration engineer, AWS architect, MLOps engineer, DevOps engineer, software tester, and technical documentation specialist.
+
+Your responsibility is to help me create a complete, functional academic software project from the absolute beginning.
+
+I have not developed anything yet.
+
+Assume that:
+- No project folder exists.
+- No source code exists.
+- No frontend exists.
+- No backend exists.
+- No database has been created.
+- No AWS resources have been configured.
+- No API endpoints have been implemented.
+- No tests have been written.
+- No CI/CD pipeline exists.
+- No project documentation has been created.
+
+Create everything required for the project.
+
+Do not assume that I have an existing application to inspect or modify.
+
+Do not merely explain what I should build. When your coding environment permits, create the actual files, implement the functionality, run commands, execute tests, and fix errors.
+
+I am a student at Vellore Institute of Technology. I want a project that is easy to understand, inexpensive to demonstrate, and suitable for evaluation in my Agile Development Process and DevOps course.
+
+I will rely heavily on AI-assisted development, so give me precise instructions and do as much of the implementation work as your available tools permit.
+
+Do not ask unnecessary questions. Choose sensible defaults and continue. If a task genuinely requires my account credentials, permission, or manual approval, explain exactly what I need to do.
+
+Never pretend that an operation succeeded when it has not been executed or verified.
+
+---
+
+# 2. PROJECT INFORMATION
+
+Institution: Vellore Institute of Technology (VIT)
+
+Project title:
+
+SERVERLESS CHATBOT WITH MLOps PIPELINE
+
+Subtitle:
+
+An AI-Powered Study Assistant with Monitoring and Delivery Automation
+
+Student: Dhanush S
+
+Registration Number: 23MIS0224
+
+Course: Agile Development Process and DevOps
+
+Faculty: Prof. Arun Kumar
+
+Semester: Fall Semester 2026
+
+Primary programming language: Python.
+
+Frontend: HTML, CSS, and vanilla JavaScript.
+
+Backend: FastAPI.
+
+Local application server: Uvicorn.
+
+AI provider: Groq API using a supported LLaMA-family model.
+
+Local database: SQLite.
+
+Cloud database: Amazon DynamoDB.
+
+Cloud deployment: AWS Lambda and Amazon API Gateway.
+
+Cloud artifact storage: Amazon S3.
+
+Cloud monitoring: Amazon CloudWatch.
+
+Testing: pytest and FastAPI TestClient/httpx.
+
+CI/CD: GitHub Actions.
+
+Operating system: Windows, with PowerShell commands for local development.
+
+---
+
+# 3. MAIN OBJECTIVE
+
+Build a complete AI-powered academic chatbot that allows students to enter questions and receive explanations.
+
+The application must demonstrate both software development and the operational lifecycle of an AI-enabled application.
+
+The finished project must include:
+
+1. A modern, responsive chatbot interface.
+2. A functioning Python FastAPI backend.
+3. AI-generated responses using the Groq API when configured.
+4. A rule-based fallback when the external AI service is unavailable.
+5. Local SQLite persistence.
+6. Cloud persistence using DynamoDB.
+7. Five genuinely integrated AWS services.
+8. Health-check and metrics endpoints.
+9. Application logging.
+10. Model-version tracking.
+11. An educational MLOps retraining simulation.
+12. Automated tests.
+13. A GitHub Actions continuous integration workflow.
+14. A working local development environment.
+15. An AWS deployment process.
+16. Technical documentation.
+17. A final academic report.
+18. A practical demonstration plan for faculty.
+
+Build the simplest reliable implementation that meets these requirements.
+
+Avoid unnecessary frameworks, excessive dependencies, complicated infrastructure, and features that do not contribute to the project objectives.
+
+---
+
+# 4. REQUIRED FIVE AWS SERVICES
+
+You must integrate exactly these five primary AWS services.
+
+## SERVICE 1: AMAZON S3
+
+Purpose:
+- Store evaluation datasets.
+- Store generated MLOps reports.
+- Store exported operational summaries.
+- Optionally host the static frontend.
+
+Implementation requirements:
+
+1. Create a Python service module using boto3.
+2. Read the bucket name and AWS Region from environment variables.
+3. Implement an artifact-upload function.
+4. Upload a sample evaluation dataset.
+5. Upload a generated MLOps simulation report.
+6. Verify that the uploaded objects can be retrieved or viewed through the AWS console.
+7. Provide clear deployment and testing instructions.
+
+Use a private bucket by default.
+
+Do not upload raw conversations automatically.
+
+Do not expose AWS credentials in frontend code or source control.
+
+Frontend hosting through S3 is optional and should only be implemented if it fits the chosen deployment approach.
+
+## SERVICE 2: AWS LAMBDA
+
+Purpose:
+Run the chatbot backend without managing an always-running application server.
+
+Implementation requirements:
+
+1. Create a Python Lambda handler.
+2. Adapt the FastAPI application using Mangum if appropriate.
+3. Handle incoming API requests.
+4. Validate request data.
+5. Invoke the Groq API when configured.
+6. Use the fallback mechanism when necessary.
+7. Save cloud records to DynamoDB when cloud mode is enabled.
+8. Produce useful operational logs.
+9. Return correct HTTP responses.
+10. Provide deployment instructions and verification steps.
+
+Keep the same core chatbot logic for local and cloud execution.
+
+Do not rewrite the entire application into a separate implementation merely for Lambda.
+
+Ensure that dependencies are compatible with the chosen Lambda runtime.
+
+## SERVICE 3: AMAZON API GATEWAY
+
+Purpose:
+Provide HTTP endpoints to the frontend and connect requests to Lambda.
+
+Implement the following routes:
+
+POST /api/chat
+
+GET /api/health
+
+GET /api/metrics
+
+GET /api/model-version
+
+POST /api/mlops/retrain-simulation
+
+Requirements:
+
+1. Connect API Gateway to the Lambda function.
+2. Configure the required routes and methods.
+3. Configure CORS for the intended frontend origin.
+4. Return suitable HTTP status codes.
+5. Validate input.
+6. Handle invalid requests safely.
+7. Provide instructions for testing the deployed API.
+8. Document the deployed API base URL.
+
+Use API Gateway HTTP API if it meets the requirements and reduces configuration complexity.
+
+Do not invent a deployed URL.
+
+## SERVICE 4: AMAZON DYNAMODB
+
+Purpose:
+Store cloud conversation records, model-version records, and MLOps run metadata.
+
+Create a table named:
+
+StudyAssistantRecords
+
+Use a simple schema with partition and sort keys if appropriate.
+
+Support the following record categories:
+
+- CONVERSATION
+- MODEL_VERSION
+- RETRAIN_RUN
+- METRIC
+
+Implementation requirements:
+
+1. Create a Python database service.
+2. Implement conversation-record insertion.
+3. Implement model-version retrieval and updates.
+4. Implement retraining-run record insertion.
+5. Add timestamps.
+6. Handle missing records.
+7. Handle database failures.
+8. Avoid storing secrets.
+9. Use environment-based configuration.
+10. Use narrowly scoped Lambda execution-role permissions.
+
+Local mode must use SQLite by default.
+
+Cloud mode must use DynamoDB when explicitly configured.
+
+Never pretend a local SQLite write is a successful DynamoDB write.
+
+## SERVICE 5: AMAZON CLOUDWATCH
+
+Purpose:
+Monitor runtime behaviour and identify errors.
+
+Implement monitoring for:
+
+- Request count.
+- Successful requests.
+- Failed requests.
+- Response duration.
+- Model-provider errors.
+- Fallback responses.
+- Application errors.
+
+Implementation requirements:
+
+1. Use Python logging.
+2. Allow Lambda logs to flow into CloudWatch Logs.
+3. Use native Lambda invocation, error, and duration metrics.
+4. Provide a simple application-level metrics endpoint.
+5. Avoid exposing credentials or complete private prompts.
+6. Document how to view the logs and metrics in the AWS console.
+7. Optionally configure a basic Lambda error alarm if it can be implemented simply.
+
+Explain the difference between application-level metrics and native CloudWatch metrics.
+
+Do not claim that process-local counters are durable across Lambda invocations.
+
+---
+
+# 5. APPLICATION ARCHITECTURE
+
+Build the following local architecture:
+
+Student
+   |
+   v
+Browser Chat Interface
+   |
+   v
+FastAPI Backend
+   |
+   +---- Groq API / LLaMA
+   |
+   +---- Rule-Based Fallback
+   |
+   +---- SQLite
+   |
+   +---- Logging and Metrics
+   |
+   +---- Model-Version Tracking
+   |
+   +---- MLOps Simulation
+
+Build the following cloud architecture:
+
+Student
+   |
+   v
+Browser Chat Interface
+   |
+   v
+Amazon API Gateway
+   |
+   v
+AWS Lambda
+   |
+   +---- Groq API / LLaMA
+   |
+   +---- Rule-Based Fallback
+   |
+   +---- Amazon DynamoDB
+   |
+   +---- Amazon S3
+   |
+   +---- Amazon CloudWatch
+
+The frontend can be hosted on S3 when configured.
+
+The cloud architecture must use the actual AWS services rather than merely displaying AWS service names in the interface.
+
+Create an ARCHITECTURE.md document explaining the architecture and request flow.
+
+Also create a Mermaid architecture diagram in the documentation.
+
+The diagram must represent the implemented design accurately.
+
+---
+
+# 6. PHASE 1: PREPARE THE DEVELOPMENT ENVIRONMENT
+
+Start from an empty project directory.
+
+First determine the available development tools.
+
+Check:
+- Python installation.
+- Python version.
+- Git installation.
+- AWS CLI availability, if relevant.
+- Current working directory.
+- Availability of a terminal.
+
+Do not assume that these tools are installed.
+
+If the coding environment supports terminal commands, execute the relevant checks.
+
+If it cannot execute commands, give me the exact PowerShell commands.
+
+Create a new project directory named:
+
+serverless-study-assistant
+
+Create and activate a Python virtual environment.
+
+Use a structure similar to:
+
+serverless-study-assistant/
+|
++-- app/
+|   +-- __init__.py
+|   +-- main.py
+|   +-- config.py
+|   +-- schemas.py
+|   +-- chat_service.py
+|   +-- model_provider.py
+|   +-- fallback.py
+|   +-- lambda_handler.py
+|   |
+|   +-- database/
+|   |   +-- __init__.py
+|   |   +-- sqlite_store.py
+|   |   +-- dynamodb_store.py
+|   |
+|   +-- services/
+|       +-- __init__.py
+|       +-- s3_service.py
+|       +-- metrics_service.py
+|       +-- model_version_service.py
+|       +-- mlops_service.py
+|
++-- frontend/
+|   +-- index.html
+|   +-- style.css
+|   +-- app.js
+|
++-- data/
+|   +-- evaluation_dataset.json
+|
++-- scripts/
+|   +-- export_report.py
+|   +-- simulate_retraining.py
+|
++-- tests/
+|   +-- test_api.py
+|   +-- test_chat.py
+|   +-- test_database.py
+|   +-- test_mlops.py
+|   +-- test_aws_services.py
+|
++-- .github/
+|   +-- workflows/
+|       +-- tests.yml
+|
++-- .env.example
++-- .gitignore
++-- requirements.txt
++-- requirements-dev.txt
++-- README.md
++-- ARCHITECTURE.md
++-- AWS_DEPLOYMENT.md
++-- PROJECT_TEST_REPORT.md
++-- FINAL_PROJECT_REPORT.md
+
+Adapt this structure if a simpler structure is justified, but implement the same required functionality.
+
+Create only files that are actually used.
+
+Do not leave essential functions empty or create unnecessary placeholder modules.
+
+---
+
+# 7. PHASE 2: BUILD THE BACKEND
+
+Implement the FastAPI application.
+
+Create the following endpoints:
+
+GET /api/health
+
+POST /api/chat
+
+GET /api/metrics
+
+GET /api/model-version
+
+POST /api/mlops/retrain-simulation
+
+Use Pydantic request and response models.
+
+Validate input lengths.
+
+Handle invalid JSON, empty messages, missing configuration, and unexpected exceptions safely.
+
+Use meaningful HTTP status codes.
+
+Enable FastAPI interactive API documentation.
+
+Ensure that the local API documentation is accessible at:
+
+http://127.0.0.1:8000/docs
+
+Use a configurable application version.
+
+The application must start with a clearly documented command.
+
+For the proposed structure, use:
+
+python -m uvicorn app.main:app --reload
+
+Run this command from the project root.
+
+Verify the actual implementation before claiming that the command works.
+
+---
+
+# 8. PHASE 3: BUILD THE CHATBOT FRONTEND
+
+Create a complete frontend using HTML, CSS, and vanilla JavaScript.
+
+The interface should include:
+
+1. A modern chatbot layout.
+2. Project title.
+3. Welcome message.
+4. Message input field.
+5. Send button.
+6. Enter-key submission.
+7. User message bubbles.
+8. Assistant response bubbles.
+9. Loading indicator.
+10. Error handling.
+11. Clear-chat functionality.
+12. Example academic questions.
+13. Responsive desktop and mobile layouts.
+14. Visible AI or fallback status.
+15. A simple model-version display.
+
+Use a consistent design.
+
+Do not introduce React or another framework unless there is a compelling technical reason.
+
+The frontend must communicate with the actual backend.
+
+Do not use fake responses or simulated network requests to make the interface appear functional.
+
+Keep the API base URL configurable so that local and cloud versions can use different endpoints.
+
+Do not expose the Groq API key in browser JavaScript.
+
+Provide a suitable local frontend-serving command if opening index.html directly is insufficient.
+
+---
+
+# 9. PHASE 4: IMPLEMENT AI RESPONSES
+
+Integrate the Groq API.
+
+Use the official Python SDK and a supported model identifier.
+
+Requirements:
+
+1. Read the API key from GROQ_API_KEY.
+2. Read the model identifier from configuration.
+3. Never hard-code credentials.
+4. Handle timeouts.
+5. Handle rate limits.
+6. Handle provider errors.
+7. Handle missing credentials.
+8. Handle empty responses.
+9. Keep the AI system prompt focused on academic study assistance.
+10. Clearly distinguish AI responses from fallback responses.
+
+Create a rule-based fallback handler.
+
+The fallback should return a useful, honest response for basic requests.
+
+It must not pretend to provide LLM-level reasoning.
+
+Create a .env.example file with placeholder configuration only.
+
+Add .env to .gitignore.
+
+Do not commit actual credentials.
+
+Write tests using mocked model responses.
+
+Do not require a real Groq API call for every automated test.
+
+---
+
+# 10. PHASE 5: IMPLEMENT LOCAL SQLITE STORAGE
+
+Create the SQLite database automatically.
+
+Implement the necessary tables and operations.
+
+Store appropriate information such as:
+
+- Conversation identifier.
+- Timestamp.
+- User message, if conversation storage is enabled.
+- Assistant response, if conversation storage is enabled.
+- Response mode.
+- Request status.
+
+Use parameterized queries.
+
+Provide a method to inspect stored records.
+
+Make local persistence work without any AWS account.
+
+Do not store API keys or secrets in the database.
+
+Avoid exposing private conversations through logs.
+
+Document how to verify that persistence is working.
+
+Write tests for inserting and retrieving records.
+
+---
+
+# 11. PHASE 6: IMPLEMENT MONITORING
+
+Create an application metrics service.
+
+Track:
+- Request count.
+- Success count.
+- Failure count.
+- Fallback count.
+- Response duration.
+
+Expose the relevant statistics through GET /api/metrics.
+
+Log errors without printing secrets or complete private prompts.
+
+Explain that local in-memory metrics reset when the application restarts.
+
+For AWS Lambda, use CloudWatch's native metrics and logs.
+
+Do not claim that application counters are persistent unless persistence has actually been implemented.
+
+Write tests for the metrics endpoint.
+
+---
+
+# 12. PHASE 7: IMPLEMENT MODEL-VERSION TRACKING
+
+Create a model-version service.
+
+Track:
+
+- Application version.
+- Configured model provider.
+- Configured model identifier.
+- Model-record version.
+- Timestamp.
+- Change reason.
+
+Explain the difference between the actual provider model identifier and the application's model-version record.
+
+The version record must be retrievable through GET /api/model-version.
+
+Implement local persistence for version changes.
+
+Prepare the service so it can use DynamoDB in cloud mode.
+
+Do not claim that the provider's underlying model weights have changed merely because an application version record was updated.
+
+---
+
+# 13. PHASE 8: IMPLEMENT THE MLOPS RETRAINING SIMULATION
+
+Implement an educational retraining simulation.
+
+This is a workflow demonstration, not genuine model training.
+
+Create a sample academic evaluation dataset containing questions and relevant evaluation information.
+
+The simulation must:
+
+1. Load the dataset.
+2. Validate its structure.
+3. Calculate simple dataset statistics.
+4. Generate a unique run identifier.
+5. Record the run timestamp.
+6. Create a simulation report.
+7. Update the workflow-version record.
+8. Save the report locally.
+9. Upload the report to S3 when cloud artifact storage is enabled.
+10. Save run metadata to DynamoDB when cloud persistence is enabled.
+11. Return a clear success or failure status.
+
+Use the endpoint:
+
+POST /api/mlops/retrain-simulation
+
+The endpoint must execute the simulation rather than return a hard-coded success response.
+
+Do not claim that a model was trained.
+
+Do not invent improvements in accuracy.
+
+Write tests for the simulation.
+
+Document what additional work would be necessary to implement real model training.
+
+---
+
+# 14. PHASE 9: IMPLEMENT THE FIVE AWS SERVICES
+
+Implement the five AWS services as actual application integrations.
+
+A. Amazon S3:
+- Create the artifact-storage module.
+- Upload evaluation datasets and generated reports.
+- Read the bucket name from environment configuration.
+- Handle access errors.
+- Verify uploaded objects.
+
+B. AWS Lambda:
+- Create a valid Lambda handler.
+- Adapt FastAPI using Mangum if appropriate.
+- Package compatible dependencies.
+- Configure environment variables.
+- Verify the deployed handler.
+
+C. Amazon API Gateway:
+- Configure the required HTTP routes.
+- Connect them to Lambda.
+- Configure CORS.
+- Test the deployed endpoints.
+
+D. Amazon DynamoDB:
+- Create the required table.
+- Implement record insertion and retrieval.
+- Store model-version and retraining-run metadata.
+- Use the Lambda execution role for access.
+
+E. Amazon CloudWatch:
+- Configure and inspect Lambda logs.
+- Use native Lambda metrics.
+- Verify that successful requests and controlled failures produce useful monitoring information.
+
+Keep the cloud integrations isolated in their respective modules.
+
+The local application must still work when AWS configuration is disabled.
+
+Use mocks to test AWS integrations locally.
+
+Never use fake implementations that silently claim a real AWS operation succeeded.
+
+---
+
+# 15. PHASE 10: SECURITY AND AWS CONFIGURATION
+
+Create configuration for:
+
+APP_ENV
+APP_VERSION
+GROQ_API_KEY
+GROQ_MODEL
+AWS_REGION
+AWS_S3_BUCKET
+AWS_DYNAMODB_TABLE
+AWS_STORAGE_ENABLED
+S3_ARTIFACTS_ENABLED
+FRONTEND_API_BASE_URL
+
+Add other configuration variables only when necessary.
+
+Use safe local defaults.
+
+Implement least-privilege IAM permissions.
+
+Do not put AWS access keys in source code.
+
+Do not expose credentials to the frontend.
+
+Restrict CORS to the intended origins in the deployed application.
+
+Use private S3 objects by default.
+
+Avoid unnecessary storage of private conversation data.
+
+Do not automatically create costly infrastructure without explaining the consequences.
+
+---
+
+# 16. PHASE 11: AUTOMATED TESTING
+
+Use pytest.
+
+Implement tests covering:
+
+1. Health endpoint.
+2. Valid chat requests.
+3. Empty messages.
+4. Invalid request payloads.
+5. Mocked successful AI responses.
+6. AI-provider errors.
+7. Fallback responses.
+8. SQLite persistence.
+9. Model-version tracking.
+10. Retraining simulation.
+11. Metrics.
+12. DynamoDB operations using mocks.
+13. S3 uploads using mocks.
+14. Lambda handler behaviour where practical.
+
+Automated tests must not require real AWS credentials.
+
+They must not require paid model API requests.
+
+Run the tests.
+
+Fix the underlying code when tests reveal genuine defects.
+
+Report the actual results.
+
+Do not fabricate the number of passing tests.
+
+If any tests cannot be executed, explain the reason.
+
+---
+
+# 17. PHASE 12: CREATE CI/CD WITH GITHUB ACTIONS
+
+Create a GitHub Actions workflow.
+
+On a push or pull request:
+
+1. Set up a compatible Python environment.
+2. Install dependencies.
+3. Run pytest.
+4. Report failures.
+
+Add formatting or lint checks only if they are straightforward and useful.
+
+Do not require AWS credentials for ordinary testing.
+
+Keep AWS deployment separate from the initial CI workflow.
+
+Explain how to create a GitHub repository and push the project.
+
+If deployment automation is implemented, use secure authentication and narrowly scoped permissions.
+
+Do not claim the pipeline succeeded until an actual workflow run confirms it.
+
+---
+
+# 18. PHASE 13: AWS DEPLOYMENT
+
+Create a beginner-friendly deployment guide.
+
+Use AWS Console instructions and simple CLI commands where appropriate.
+
+Explain the process in the correct order:
+
+1. Create or access an AWS account.
+2. Choose an AWS Region.
+3. Configure the AWS CLI if needed.
+4. Create an S3 bucket.
+5. Create the DynamoDB table.
+6. Create a suitable Lambda execution role.
+7. Configure the required IAM permissions.
+8. Package and deploy the Lambda function.
+9. Configure environment variables.
+10. Configure API Gateway routes.
+11. Deploy the API stage.
+12. Configure CORS.
+13. Test the deployed API.
+14. Verify DynamoDB records.
+15. Verify S3 objects.
+16. Verify CloudWatch logs.
+17. Configure the frontend to use the cloud API.
+18. Perform an end-to-end test.
+19. Capture evidence for the project report.
+20. Clean up unused resources.
+
+Use AWS SAM or another straightforward deployment approach if it genuinely simplifies the process.
+
+Do not introduce complicated infrastructure tooling without a clear need.
+
+If a deployment requires my account login, authorization, or approval, stop and provide exact next steps.
+
+Do not invent resource identifiers or deployed endpoints.
+
+If deployment is not possible, complete and test the local application first.
+
+---
+
+# 19. PHASE 14: CREATE THE DOCUMENTATION
+
+Generate these files:
+
+README.md:
+- Project overview.
+- Features.
+- Technology stack.
+- Installation.
+- Configuration.
+- Running the application.
+- API endpoints.
+- Testing.
+- Troubleshooting.
+
+ARCHITECTURE.md:
+- Local architecture.
+- Cloud architecture.
+- Request flow.
+- Storage flow.
+- Monitoring.
+- MLOps simulation.
+- Role of the five AWS services.
+
+AWS_DEPLOYMENT.md:
+- Prerequisites.
+- AWS setup.
+- IAM permissions.
+- Deployment.
+- Testing.
+- Monitoring.
+- Cleanup.
+
+PROJECT_TEST_REPORT.md:
+- Test cases.
+- Expected results.
+- Actual results.
+- Pass/fail status.
+- Known limitations.
+- Evidence references.
+
+FINAL_PROJECT_REPORT.md:
+
+Prepare the academic report with:
+
+1. Abstract.
+2. Introduction.
+3. Problem statement.
+4. Objectives.
+5. Scope and requirements.
+6. Technology overview.
+7. Architecture and design.
+8. Five AWS services.
+9. Implementation methodology.
+10. Agile and DevOps practices.
+11. MLOps workflow.
+12. Testing and evaluation.
+13. Results and discussion.
+14. Limitations and risks.
+15. Future enhancements.
+16. Conclusion.
+17. References.
+
+Use the project information supplied in this prompt.
+
+Clearly distinguish implemented, tested, simulated, and planned features.
+
+Never invent test results, accuracy scores, deployment URLs, or cloud evidence.
+
+---
+
+# 20. PHASE 15: PREPARE THE FACULTY DEMONSTRATION
+
+Create a practical demonstration checklist.
+
+The demonstration should take approximately 5–10 minutes.
+
+Include:
+
+1. Starting the application.
+2. Asking an academic question.
+3. Showing the AI response.
+4. Explaining fallback mode.
+5. Opening the health endpoint.
+6. Showing local SQLite persistence.
+7. Demonstrating a cloud chat request.
+8. Showing a DynamoDB record.
+9. Showing an S3 artifact.
+10. Showing CloudWatch logs.
+11. Demonstrating model-version tracking.
+12. Running the MLOps simulation.
+13. Running pytest.
+14. Showing the GitHub Actions result.
+15. Explaining the architecture.
+
+For each step, provide the exact command or action and the expected result.
+
+Distinguish the local demonstration from the AWS demonstration.
+
+---
+
+# 21. DEVELOPMENT RULES
+
+Follow these rules throughout the project.
+
+1. Start from an empty project directory.
+2. Create the project structure yourself when tool access permits.
+3. Do not assume that any existing code is available.
+4. Do not skip implementation phases.
+5. Do not generate the entire project as disconnected, untested code.
+6. Build incrementally.
+7. Run tests after implementing each major component.
+8. Fix errors before moving to the next phase whenever practical.
+9. Preserve a working local version.
+10. Keep dependencies minimal.
+11. Do not hard-code credentials.
+12. Do not create unnecessary AWS resources.
+13. Do not fabricate test results.
+14. Do not claim successful deployment without evidence.
+15. Do not claim genuine model training when only a simulation exists.
+16. Do not leave required functions empty.
+17. Do not silently substitute fake cloud operations.
+18. Use PowerShell commands for Windows.
+19. Provide exact file paths and commands.
+20. Explain important concepts in simple English.
+21. Keep a checklist of completed, tested, pending, and blocked tasks.
+22. Make actual file changes whenever the available environment permits.
+23. Verify file contents and execution results.
+24. If you encounter an error, diagnose and correct it rather than merely suggesting that I try again.
+25. Never claim that you executed a command if you only provided it as an instruction.
+
+If you cannot directly access my computer, explain that limitation and provide the exact commands or complete source files needed to proceed.
+
+---
+
+# 22. FINAL ACCEPTANCE CRITERIA
+
+The project is complete only when the applicable requirements have been implemented and verified.
+
+The final application should demonstrate:
+
+- A working frontend.
+- A working FastAPI backend.
+- AI integration when configured.
+- A working fallback.
+- SQLite persistence in local mode.
+- DynamoDB persistence in cloud mode.
+- S3 artifact uploads.
+- Lambda execution.
+- API Gateway endpoints.
+- CloudWatch monitoring.
+- Health and metrics endpoints.
+- Model-version tracking.
+- An executable MLOps simulation.
+- Automated tests.
+- A GitHub Actions workflow.
+- Documentation.
+- A repeatable demonstration procedure.
+
+Provide a final status table:
+
+| Component | Status | Verification evidence |
+|---|---|---|
+| Frontend | | |
+| FastAPI backend | | |
+| Groq integration | | |
+| Fallback | | |
+| SQLite | | |
+| S3 | | |
+| Lambda | | |
+| API Gateway | | |
+| DynamoDB | | |
+| CloudWatch | | |
+| Health and metrics | | |
+| Model-version tracking | | |
+| MLOps simulation | | |
+| Automated tests | | |
+| GitHub Actions | | |
+| AWS deployment | | |
+| Documentation | | |
+
+Use only evidence obtained from actual implementation and testing.
+
+Provide the exact commands for starting, stopping, testing, and demonstrating the application.
+
+---
+
+# START DEVELOPMENT NOW
+
+Begin with PHASE 1.
+
+Create the project from scratch.
+
+First check the available development environment and establish the project directory.
+
+Then create the virtual environment, install the necessary dependencies, and implement the backend and frontend.
+
+Continue through all phases in the specified order.
+
+Do not stop after creating the architecture or writing the README.
+
+My goal is to develop a complete working project from zero, with five integrated AWS services, automated testing, and documentation suitable for my VIT academic evaluation.

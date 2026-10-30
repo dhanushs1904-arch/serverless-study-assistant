@@ -1,0 +1,6 @@
+{
+  "name": "Serverless Chatbot with MLOps Pipeline",
+  "description": "An AI-Powered Study Assistant with Monitoring and Delivery Automation built with FastAPI, 5 AWS Services, and MLOps lifecycle by Dhanush S (23MIS0224) - VIT.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
