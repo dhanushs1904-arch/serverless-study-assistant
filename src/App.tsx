@@ -78,8 +78,36 @@ export default function App() {
   const [selectedDoc, setSelectedDoc] = useState<'report' | 'arch' | 'deploy' | 'testreport' | 'checklist'>('checklist');
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
 
-  // Quick query dispatcher
-  const handleSendMessage = (textToSend?: string) => {
+  const [groqApiKey, setGroqApiKey] = useState(() => {
+    return localStorage.getItem('GROQ_API_KEY') || '';
+  });
+  const [groqModel, setGroqModel] = useState('llama-3.3-70b-versatile');
+
+  // Fallback concept resolver
+  const getFallbackAnswer = (query: string): string => {
+    const lower = query.toLowerCase();
+
+    if (lower.includes('deadlock') || lower.includes('coffman')) {
+      return "### [Academic Concept] Operating Systems: Deadlock & Coffman Conditions\n\n**Core Definition:**\nA deadlock is a permanent state where a set of processes are blocked because each holds a resource while waiting for another resource held by another process in the chain.\n\n**The 4 Coffman Necessary Conditions:**\n1. **Mutual Exclusion:** Resources cannot be shared; only one process holds a resource at a time.\n2. **Hold and Wait:** A process holding at least one resource is actively waiting to acquire additional resources held by other processes.\n3. **No Preemption:** Resources cannot be forcibly seized; only the holding process can voluntarily release them.\n4. **Circular Wait:** A closed chain of processes {P0, P1, ... Pn} exists such that P0 waits for a resource held by P1, and Pn waits for P0.\n\n**VIT Exam Tip:** Deadlock prevention invalidates at least one condition (e.g. strict global resource numbering eliminates Circular Wait).";
+    } else if (lower.includes('scrum') || lower.includes('sprint') || lower.includes('backlog')) {
+      return "### [Academic Concept] Agile Scrum Framework: Backlogs & Roles\n\n**Core Concept:**\n- **Product Backlog:** An ordered, evolving list of features, improvements, and fixes managed exclusively by the Product Owner.\n- **Sprint Backlog:** A committed forecast subset selected by the Development Team for execution during the current time-boxed Sprint (1–4 weeks) to achieve the Sprint Goal.\n\n**Key Scrum Ceremonies:**\n- **Sprint Planning:** Scope definition and backlog breakdown.\n- **Daily Scrum:** 15-minute sync (Yesterday, Today, Blockers).\n- **Sprint Review:** Working software demonstration to stakeholders.\n- **Sprint Retrospective:** Team continuous process improvement.";
+    } else if (lower.includes('ci/cd') || lower.includes('devops') || lower.includes('pipeline')) {
+      return "### [Academic Concept] DevOps: CI/CD Pipeline Architecture\n\n**Definitions:**\n- **Continuous Integration (CI):** Developers merge code changes frequently into a shared repository (main branch). Every push triggers automated builds and regression tests (e.g. pytest in GitHub Actions) to identify integration defects within minutes.\n- **Continuous Delivery (CD):** Ensures validated software can be released to staging/production reliably at any time via automated deployment scripts (e.g. AWS SAM / Lambda updates).\n\n**Role in this Project:** GitHub Actions executes `.github/workflows/tests.yml` to run 27 automated tests on every push before release packaging.";
+    } else if (lower.includes('lambda') || lower.includes('serverless')) {
+      return "### [Academic Concept] Cloud Architecture: Serverless AWS Lambda\n\n**Core Principles:**\n- **Event-Driven Execution:** Lambda functions invoke in response to HTTP events from Amazon API Gateway without requiring an always-on EC2 server.\n- **Scale-to-Zero:** Incurs zero cost when idle; charges are computed in 1-millisecond increments based on memory (512 MB) and execution duration.\n- **Mangum ASGI Integration:** In this project, Mangum adapts the FastAPI ASGI specification directly to API Gateway v2 event payloads.";
+    } else if (lower.includes('acid') || lower.includes('transaction')) {
+      return "### [Academic Concept] Database Systems: ACID Properties\n\n**The Four Guarantees:**\n- **Atomicity:** All-or-nothing execution; partial failure rolls back all mutations.\n- **Consistency:** Transactions transition database state from one valid integrity state to another.\n- **Isolation:** Concurrent transaction execution yields identical results to serial execution.\n- **Durability:** Committed changes persist safely in non-volatile storage despite power or system failures.\n\n*Contrast with DynamoDB:* DynamoDB relaxes strict cross-table ACID for single-digit millisecond horizontal scaling using Partition Keys.";
+    } else if (lower.includes('tcp') || lower.includes('handshake') || lower.includes('syn')) {
+      return "### [Academic Concept] Computer Networks: TCP Three-Way Handshake\n\n**Connection Establishment Process:**\n1. **Step 1 (SYN):** Client sends a SYN segment with Initial Sequence Number (ISN = x) requesting connection.\n2. **Step 2 (SYN-ACK):** Server receives SYN, allocates buffers, responds with SYN-ACK (ACK = x + 1, ISN = y).\n3. **Step 3 (ACK):** Client returns ACK segment (ACK = y + 1) to transition both sockets to ESTABLISHED state.\n\n**Exam Tip:** TCP guarantees reliable, ordered byte delivery; UDP is connectionless and unacknowledged.";
+    } else if (lower.includes('drift') || lower.includes('mlops')) {
+      return "### [Academic Concept] MLOps: Concept Drift & Pipeline Automation\n\n**Core Challenge:**\nMachine learning models experience accuracy degradation in production when real-world distribution drifts away from training benchmarks (Data Drift & Concept Drift).\n\n**Automated MLOps Pipeline Response:**\n1. Periodic benchmark evaluation against ground truth datasets (`evaluation_dataset.json`).\n2. Metric calculation (Precision, Recall, F1-Score).\n3. Version progression (`v1.0.0` -> `v1.1.0`) and S3 report generation.\n4. Automated shadow evaluation before production serving cutover.";
+    } else {
+      return `### [Study Assistant Guidance] Academic Analysis\n\n**Query Inquired:** "${query}"\n\n**Recommended Academic Framework:**\n1. **Theoretical Definition:** Identify core architectural definitions and underlying computer science principles.\n2. **System Trade-offs:** Evaluate throughput, latency, consistency, and operational complexity.\n3. **Practical Implementation:** Verify functionality using unit tests and CI/CD pipelines.\n\n*Status: Generated via Deterministic Academic Knowledge Engine.*`;
+    }
+  };
+
+  // Quick query dispatcher with live Groq API integration
+  const handleSendMessage = async (textToSend?: string) => {
     const query = (textToSend || inputMessage).trim();
     if (!query) return;
 
@@ -93,66 +121,105 @@ export default function App() {
     if (!textToSend) setInputMessage('');
     setIsTyping(true);
 
-    setTimeout(() => {
-      let replyText = '';
-      const lower = query.toLowerCase();
+    const startTime = performance.now();
+    let replyText = '';
+    let responseMode: 'groq' | 'fallback' = aiMode;
+    let modelId = aiMode === 'groq' ? groqModel : 'heuristic-academic-v1';
 
-      if (lower.includes('deadlock') || lower.includes('coffman')) {
-        replyText = "### [Academic Concept] Operating Systems: Deadlock & Coffman Conditions\n\n**Core Definition:**\nA deadlock is a permanent state where a set of processes are blocked because each holds a resource while waiting for another resource held by another process in the chain.\n\n**The 4 Coffman Necessary Conditions:**\n1. **Mutual Exclusion:** Resources cannot be shared; only one process holds a resource at a time.\n2. **Hold and Wait:** A process holding at least one resource is actively waiting to acquire additional resources held by other processes.\n3. **No Preemption:** Resources cannot be forcibly seized; only the holding process can voluntarily release them.\n4. **Circular Wait:** A closed chain of processes {P0, P1, ... Pn} exists such that P0 waits for a resource held by P1, and Pn waits for P0.\n\n**VIT Exam Tip:** Deadlock prevention invalidates at least one condition (e.g. strict global resource numbering eliminates Circular Wait).";
-      } else if (lower.includes('scrum') || lower.includes('sprint') || lower.includes('backlog')) {
-        replyText = "### [Academic Concept] Agile Scrum Framework: Backlogs & Roles\n\n**Core Concept:**\n- **Product Backlog:** An ordered, evolving list of features, improvements, and fixes managed exclusively by the Product Owner.\n- **Sprint Backlog:** A committed forecast subset selected by the Development Team for execution during the current time-boxed Sprint (1–4 weeks) to achieve the Sprint Goal.\n\n**Key Scrum Ceremonies:**\n- **Sprint Planning:** Scope definition and backlog breakdown.\n- **Daily Scrum:** 15-minute sync (Yesterday, Today, Blockers).\n- **Sprint Review:** Working software demonstration to stakeholders.\n- **Sprint Retrospective:** Team continuous process improvement.";
-      } else if (lower.includes('ci/cd') || lower.includes('devops') || lower.includes('pipeline')) {
-        replyText = "### [Academic Concept] DevOps: CI/CD Pipeline Architecture\n\n**Definitions:**\n- **Continuous Integration (CI):** Developers merge code changes frequently into a shared repository (main branch). Every push triggers automated builds and regression tests (e.g. pytest in GitHub Actions) to identify integration defects within minutes.\n- **Continuous Delivery (CD):** Ensures validated software can be released to staging/production reliably at any time via automated deployment scripts (e.g. AWS SAM / Lambda updates).\n\n**Role in this Project:** GitHub Actions executes `.github/workflows/tests.yml` to run 27 automated tests on every push before release packaging.";
-      } else if (lower.includes('lambda') || lower.includes('serverless')) {
-        replyText = "### [Academic Concept] Cloud Architecture: Serverless AWS Lambda\n\n**Core Principles:**\n- **Event-Driven Execution:** Lambda functions invoke in response to HTTP events from Amazon API Gateway without requiring an always-on EC2 server.\n- **Scale-to-Zero:** Incurs zero cost when idle; charges are computed in 1-millisecond increments based on memory (512 MB) and execution duration.\n- **Mangum ASGI Integration:** In this project, Mangum adapts the FastAPI ASGI specification directly to API Gateway v2 event payloads.";
-      } else if (lower.includes('acid') || lower.includes('transaction')) {
-        replyText = "### [Academic Concept] Database Systems: ACID Properties\n\n**The Four Guarantees:**\n- **Atomicity:** All-or-nothing execution; partial failure rolls back all mutations.\n- **Consistency:** Transactions transition database state from one valid integrity state to another.\n- **Isolation:** Concurrent transaction execution yields identical results to serial execution.\n- **Durability:** Committed changes persist safely in non-volatile storage despite power or system failures.\n\n*Contrast with DynamoDB:* DynamoDB relaxes strict cross-table ACID for single-digit millisecond horizontal scaling using Partition Keys.";
-      } else if (lower.includes('drift') || lower.includes('mlops')) {
-        replyText = "### [Academic Concept] MLOps: Concept Drift & Pipeline Automation\n\n**Core Challenge:**\nMachine learning models experience accuracy degradation in production when real-world distribution drifts away from training benchmarks (Data Drift & Concept Drift).\n\n**Automated MLOps Pipeline Response:**\n1. Periodic benchmark evaluation against ground truth datasets (`evaluation_dataset.json`).\n2. Metric calculation (Precision, Recall, F1-Score).\n3. Version progression (`v1.0.0` -> `v1.1.0`) and S3 report generation.\n4. Automated shadow evaluation before production serving cutover.";
-      } else {
-        replyText = `### [Study Assistant Guidance] Academic Analysis\n\n**Query:** "${query}"\n\n**Engineering Study Framework:**\n1. **Theoretical Definition:** Identify core architectural definitions and underlying principles.\n2. **System Trade-offs:** Evaluate throughput, latency, consistency, and operational overhead.\n3. **Practical Implementation:** Verify functionality using unit tests and CI/CD pipelines.\n\n*Status: Generated via ${aiMode === 'groq' ? 'Groq LLaMA 3.3 70B Engine' : 'Deterministic Rule-Based Knowledge Engine'}.*`;
-      }
+    // If Groq mode is active AND API key is present, perform live Groq API inference
+    if (aiMode === 'groq' && groqApiKey.trim()) {
+      try {
+        const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${groqApiKey.trim()}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: groqModel,
+            messages: [
+              {
+                role: 'system',
+                content: 'You are an expert academic tutor and study assistant for engineering and computer science students at Vellore Institute of Technology (VIT). Structure your explanations with academic rigor, clear definitions, bullet points, and exam/viva tips.'
+              },
+              {
+                role: 'user',
+                content: query
+              }
+            ],
+            temperature: 0.3,
+            max_tokens: 1024
+          })
+        });
 
-      const duration = aiMode === 'groq' ? Math.floor(Math.random() * 200 + 250) : Math.floor(Math.random() * 8 + 3);
-      const assistantMsg: ChatMessage = {
-        id: 'msg-' + Date.now(),
-        sender: 'assistant',
-        text: replyText,
-        response_mode: aiMode,
-        model_identifier: aiMode === 'groq' ? 'llama-3.3-70b-versatile' : 'heuristic-academic-v1',
-        duration_ms: duration,
-        timestamp: new Date().toLocaleTimeString(),
-        storage_recorded: true
-      };
-
-      setMessages(prev => [...prev, assistantMsg]);
-      setIsTyping(false);
-
-      // Add to simulated DynamoDB and CloudWatch
-      const convId = 'conv-' + Math.random().toString(36).substring(2, 9);
-      const newDynamoRec: DynamoRecord = {
-        PK: `CONVERSATION#${convId}`,
-        SK: new Date().toISOString(),
-        EntityType: 'CONVERSATION',
-        Timestamp: new Date().toISOString(),
-        Summary: `Query: ${query.slice(0, 40)}...`,
-        Details: {
-          user_message: query,
-          response_mode: aiMode,
-          duration_ms: duration,
-          model: aiMode === 'groq' ? 'llama-3.3-70b-versatile' : 'heuristic-academic-v1'
+        if (!groqRes.ok) {
+          const errData = await groqRes.json().catch(() => ({}));
+          throw new Error(errData.error?.message || `Groq API returned HTTP ${groqRes.status}`);
         }
-      };
-      setDynamoRecords(prev => [newDynamoRec, ...prev]);
 
-      const newLog: CloudWatchLog = {
-        timestamp: new Date().toISOString(),
-        level: 'INFO',
-        requestId: 'req-' + Math.random().toString(36).substring(2, 10),
-        message: `METRICS_EVENT: {"event": "api_request", "duration_ms": ${duration}, "mode": "${aiMode}", "status": 200}`
-      };
-      setCwLogs(prev => [newLog, ...prev]);
-    }, 600);
+        const data = await groqRes.json();
+        replyText = data.choices[0]?.message?.content || 'No response content returned by Groq.';
+        responseMode = 'groq';
+        modelId = groqModel;
+      } catch (err: any) {
+        // Graceful automatic degradation to rule-based fallback on Groq error/rate limit
+        const fallbackConcept = getFallbackAnswer(query);
+        replyText = `${fallbackConcept}\n\n> *[Notice: Switched to Rule-Based Fallback due to Groq API error (${err.message}). Deterministic knowledge engine engaged.]*`;
+        responseMode = 'fallback';
+        modelId = 'heuristic-academic-v1';
+      }
+    } else {
+      // Deterministic academic fallback engine
+      const fallbackConcept = getFallbackAnswer(query);
+      if (aiMode === 'groq' && !groqApiKey.trim()) {
+        replyText = `${fallbackConcept}\n\n> *[Notice: Groq Mode selected. To enable live LLaMA 3.3 70B generation, enter your free API key from console.groq.com in the sidebar. Currently using Rule-Based Fallback Engine.]*`;
+      } else {
+        replyText = fallbackConcept;
+      }
+      responseMode = 'fallback';
+      modelId = 'heuristic-academic-v1';
+    }
+
+    const duration = Math.max(4, Math.round(performance.now() - startTime));
+
+    const assistantMsg: ChatMessage = {
+      id: 'msg-' + Date.now(),
+      sender: 'assistant',
+      text: replyText,
+      response_mode: responseMode,
+      model_identifier: modelId,
+      duration_ms: duration,
+      timestamp: new Date().toLocaleTimeString(),
+      storage_recorded: true
+    };
+
+    setMessages(prev => [...prev, assistantMsg]);
+    setIsTyping(false);
+
+    // Record interaction in simulated DynamoDB & CloudWatch
+    const convId = 'conv-' + Math.random().toString(36).substring(2, 9);
+    const newDynamoRec: DynamoRecord = {
+      PK: `CONVERSATION#${convId}`,
+      SK: new Date().toISOString(),
+      EntityType: 'CONVERSATION',
+      Timestamp: new Date().toISOString(),
+      Summary: `Query: ${query.slice(0, 40)}...`,
+      Details: {
+        user_message: query,
+        response_mode: responseMode,
+        duration_ms: duration,
+        model: modelId
+      }
+    };
+    setDynamoRecords(prev => [newDynamoRec, ...prev]);
+
+    const newLog: CloudWatchLog = {
+      timestamp: new Date().toISOString(),
+      level: 'INFO',
+      requestId: 'req-' + Math.random().toString(36).substring(2, 10),
+      message: `METRICS_EVENT: {"event": "api_request", "duration_ms": ${duration}, "mode": "${responseMode}", "model": "${modelId}", "status": 200}`
+    };
+    setCwLogs(prev => [newLog, ...prev]);
   };
 
   // Run MLOps Simulation
@@ -283,8 +350,45 @@ export default function App() {
                     Groq AI Mode
                   </button>
                 </div>
+
+                {/* Groq API Key Configuration */}
+                {aiMode === 'groq' && (
+                  <div className="mt-3 pt-2.5 border-t border-slate-700/80">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-[11px] font-medium text-slate-300">Groq API Key:</span>
+                      <a
+                        href="https://console.groq.com/keys"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[10px] text-cyan-400 hover:underline flex items-center gap-0.5"
+                      >
+                        Get free key <ExternalLink className="w-2.5 h-2.5" />
+                      </a>
+                    </div>
+                    <input
+                      type="password"
+                      placeholder="gsk_..."
+                      value={groqApiKey}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setGroqApiKey(val);
+                        localStorage.setItem('GROQ_API_KEY', val);
+                      }}
+                      className="w-full bg-slate-950 border border-slate-700 rounded px-2.5 py-1 text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-cyan-500 font-mono"
+                    />
+                    <div className="flex justify-between items-center mt-1.5 text-[10px] text-slate-400">
+                      <span>Model: <strong className="text-cyan-300">{groqModel}</strong></span>
+                      <span className={groqApiKey.trim() ? "text-emerald-400" : "text-amber-400"}>
+                        {groqApiKey.trim() ? "Active (Live)" : "Enter Key for Live AI"}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
                 <p className="text-[11px] text-slate-400 mt-2">
-                  Demonstrates graceful degradation: when external AI is offline or rate-limited, the deterministic engine ensures 100% availability.
+                  {aiMode === 'groq'
+                    ? 'Uses Groq API (LLaMA 3.3 70B) for real-time reasoning with automatic fallback on rate limit.'
+                    : 'Deterministic academic knowledge engine ensuring 100% availability with zero external API calls.'}
                 </p>
               </div>
 
